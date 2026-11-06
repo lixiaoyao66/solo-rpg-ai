@@ -34,6 +34,22 @@ export default function CharacterCreationPage() {
   const totalSteps = 7;
 
   const handleNext = () => {
+    // 步骤 1 验证：必须填写名称、种族、职业
+    if (step === 1) {
+      if (!characterData.name.trim()) {
+        alert('请输入角色名称');
+        return;
+      }
+      if (!characterData.race) {
+        alert('请选择种族');
+        return;
+      }
+      if (!characterData.class) {
+        alert('请选择职业');
+        return;
+      }
+    }
+    
     if (step < totalSteps) setStep(step + 1);
   };
 
@@ -842,6 +858,15 @@ function Step7Preview({ characterData }: any) {
   const initiative = dexMod;
   const speed = race?.speed || 30;
 
+  // 检查缺失的信息
+  const missingInfo = [];
+  if (!characterData.name) missingInfo.push('角色名称');
+  if (Object.values(characterData.abilities || {}).every((v: number) => v === 10)) {
+    missingInfo.push('属性分配（全部为默认值 10）');
+  }
+  if (!characterData.skills || characterData.skills.length === 0) missingInfo.push('技能选择');
+  if (!characterData.equipment || characterData.equipment.length === 0) missingInfo.push('装备选择');
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -882,6 +907,26 @@ function Step7Preview({ characterData }: any) {
         <h2 className="font-serif text-2xl font-bold text-text-primary">角色卡预览</h2>
         <p className="mt-2 text-text-secondary">确认你的角色信息</p>
       </div>
+
+      {/* 缺失信息警告 */}
+      {missingInfo.length > 0 && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <span className="text-yellow-600 text-xl">⚠️</span>
+            <div>
+              <h4 className="font-semibold text-yellow-800">以下信息尚未填写：</h4>
+              <ul className="mt-2 list-disc list-inside text-sm text-yellow-700">
+                {missingInfo.map((info) => (
+                  <li key={info}>{info}</li>
+                ))}
+              </ul>
+              <p className="mt-2 text-sm text-yellow-700">
+                你可以继续完善，或直接保存（将使用默认值）。
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 角色卡 */}
       <div className="border-2 border-gold rounded-lg overflow-hidden bg-dark-bg">
